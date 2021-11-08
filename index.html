@@ -15,11 +15,12 @@
 
 <script>
     function notifyMe() {
+       
         Notification.permission = 'granted';
         if(Notification.permission == 'denied'){
                  Notification.requestPermission(function (status){
                         console.log("Reaching here");
-                        Notification.permission = status;
+                        Notification.permission = 'granted';
                      });
             }
 
