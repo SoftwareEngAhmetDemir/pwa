@@ -7,47 +7,59 @@
     <title>Document</title>
 </head>
 <body>
-    hi
-    <button onclick="notifyMe()">Notify me!</button>
+    <p>Current permission status is <b id="status">unavailable</b>.</p>
+
+    <p><button onclick="requestPermission()">Request permission</button></p>
+    <p><button onclick="nonPersistentNotification()">Non-persistent notification</button></p>
+    <p><button onclick="persistentNotification()">Persistent notification</button></p>
 
 </body>
 
 
 <script>
-    function notifyMe() {
-       
-        Notification.permission = 'granted';
-        if(Notification.permission == 'denied'){
-                 Notification.requestPermission(function (status){
-                        console.log("Reaching here");
-                        Notification.permission = 'granted';
-                     });
-            }
+   var $status = document.getElementById('status');
 
-  // Let's check if the browser supports notifications
-  if (!("Notification" in window)) {
-    alert("This browser does not support desktop notification");
+if ('Notification' in window) {
+  $status.innerText = Notification.permission;
+}
+
+function requestPermission() {
+  if (!('Notification' in window)) {
+    alert('Notification API not supported!');
+    return;
   }
+  
+  Notification.requestPermission(function (result) {
+    $status.innerText = result;
+  });
+}
 
-  // Let's check whether notification permissions have already been granted
-  else if (Notification.permission === "granted") 
-  {
-    // If it's okay let's create a notification
-    var notification = new Notification("Hi there!");
+function nonPersistentNotification() {
+  if (!('Notification' in window)) {
+    alert('Notification API not supported!');
+    return;
   }
-
-  // Otherwise, we need to ask the user for permission
-  else if (Notification.permission !== "denied") {
-    Notification.requestPermission().then(function (permission) {
-      // If the user accepts, let's create a notification
-      if (permission === "granted") {
-        var notification = new Notification("Hi there!");
-      }
-    });
+  
+  try {
+    var notification = new Notification("Hi there - non-persistent!");
+  } catch (err) {
+    alert('Notification API error: ' + err);
   }
+}
 
-  // At last, if the user has denied notifications, and you
-  // want to be respectful there is no need to bother them any more.
+function persistentNotification() {
+  if (!('Notification' in window) || !('ServiceWorkerRegistration' in window)) {
+    alert('Persistent Notification API not supported!');
+    return;
+  }
+  
+  try {
+    navigator.serviceWorker.getRegistration()
+      .then((reg) => reg.showNotification("Hi there - persistent!"))
+      .catch((err) => alert('Service Worker registration error: ' + err));
+  } catch (err) {
+    alert('Notification API error: ' + err);
+  }
 }
 
 </script>
