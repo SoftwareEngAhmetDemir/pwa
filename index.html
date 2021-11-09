@@ -17,7 +17,20 @@
 
 
 <script>
-   var $status = document.getElementById('status');
+ 
+ if ('serviceWorker' in navigator) {
+   navigator.serviceWorker
+     .register('./service-worker.js', { scope: './' })
+       .then(function (registration) {
+          console.log("Service Worker Registered");
+    })
+      .catch(function (err) {
+        console.log("Service Worker Failed to Register", err);
+     })
+
+ }
+ 
+ var $status = document.getElementById('status');
 
 if ('Notification' in window) {
   $status.innerText = Notification.permission;
@@ -52,9 +65,9 @@ function persistentNotification() {
     alert('Persistent Notification API not supported!');
     return;
   }
-  
+
   try {
-    navigator.serviceWorker.getRegistration()
+  navigator.serviceWorker.getRegistration()
       .then((reg) => reg.showNotification("Hi there - persistent!"))
       .catch((err) => alert('Service Worker registration error: ' + err));
   } catch (err) {
